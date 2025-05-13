@@ -7,7 +7,10 @@ exports.getVolunteers = async (req, res) => {
     const volunteers = await Volunteer.find().sort({ createdAt: -1 });
     res.json({ success: true, data: volunteers });
   } catch (error) {
-    handleError(res, error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Error fetching volunteers' 
+    });
   }
 };
 
@@ -18,7 +21,16 @@ exports.createVolunteer = async (req, res) => {
     await volunteer.save();
     res.status(201).json({ success: true, data: volunteer });
   } catch (error) {
-    handleError(res, error);
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email already exists' 
+      });
+    }
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Error creating volunteer' 
+    });
   }
 };
 
@@ -40,7 +52,10 @@ exports.updateVolunteerStatus = async (req, res) => {
     
     res.json({ success: true, data: volunteer });
   } catch (error) {
-    handleError(res, error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Error updating volunteer status' 
+    });
   }
 };
 
@@ -62,7 +77,10 @@ exports.updateVolunteer = async (req, res) => {
     
     res.json({ success: true, data: volunteer });
   } catch (error) {
-    handleError(res, error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Error updating volunteer' 
+    });
   }
 };
 
@@ -79,7 +97,10 @@ exports.deleteVolunteer = async (req, res) => {
     
     res.json({ success: true, data: {} });
   } catch (error) {
-    handleError(res, error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Error deleting volunteer' 
+    });
   }
 };
 
@@ -102,7 +123,10 @@ exports.addVolunteerEvent = async (req, res) => {
     await volunteer.save();
     res.json({ success: true, data: volunteer });
   } catch (error) {
-    handleError(res, error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Error adding volunteer event' 
+    });
   }
 };
 
@@ -124,6 +148,9 @@ exports.updateVolunteerNotes = async (req, res) => {
     
     res.json({ success: true, data: volunteer });
   } catch (error) {
-    handleError(res, error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Error updating volunteer notes' 
+    });
   }
 }; 
