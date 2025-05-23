@@ -51,7 +51,7 @@ exports.getUserById = async (req, res) => {
 // Create user
 exports.createUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, accountType } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -64,6 +64,7 @@ exports.createUser = async (req, res) => {
       name,
       email,
       password,
+      accountType,
       role
     });
 

@@ -51,6 +51,47 @@ exports.authenticate = async (req, res, next) => {
   }
 };
 
+// Authenticate individual user
+exports.authenticateIndividual = async (req, res, next) => {
+  try {
+    const individualToken = req.cookies?.individualToken || req.header('Authorization')?.replace('Bearer ', '');
+    if (!individualToken) {
+      return res.status(401).json({ 
+        success: false,
+        message: "Authorization token required" 
+      });
+      }
+
+    const decoded = jwt.verify(individualToken, process.env.JWT_SECRET);
+    if (decoded.exp < Date.now() / 1000) {
+      res.clearCookie('individualToken');
+      return res.status(401).json({ success: false, error: 'Token expired' });
+    }
+
+    const individual = await Individual.findById(decoded.id).select('-password');
+    if (!individual) {
+      return res.status(401).json({ 
+        success: false,
+        message: "User not found" 
+      });
+    }
+
+    if (individual.status !== 'active') {
+      return res.status(403).json({ success: false, error: 'User account is inactive' });
+    }
+
+
+    req.individual = individual;
+    next();
+  } catch (error) {
+    console.error('Authentication error:', error.message);
+    return res.status(401).json({ 
+      success: false,
+      message: "Invalid or expired token" 
+    });
+  }
+};
+
 // Role hierarchy
 const roleHierarchy = {
   'admin': 0,
