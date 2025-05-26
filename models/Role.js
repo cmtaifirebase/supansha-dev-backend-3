@@ -27,6 +27,7 @@ const roleSchema = new mongoose.Schema(
       formats: permissionsTypeSchema,
       events: permissionsTypeSchema,
       jobs: permissionsTypeSchema,
+      internships: permissionsTypeSchema,
       blogs: permissionsTypeSchema,
       causes: permissionsTypeSchema,
       crowdFunding: permissionsTypeSchema,
