@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const jobRoutes = require('./routes/jobRoutes');
+const internshipRoutes = require('./routes/internshipRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const donationRoutes = require('./routes/donationRoutes');
 const activityRoutes = require('./routes/activityRoutes')
@@ -63,6 +64,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/event', eventRoutes);
 app.use('/api/job', jobRoutes);
+app.use('/api/internship', internshipRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/donation', donationRoutes);
 app.use('/api/activities', activityRoutes)
