@@ -20,6 +20,7 @@ const roleRoutes = require('./routes/roleRoutes')
 const causeRoutes = require('./routes/causeRoutes')
 const volunteerRoutes = require('./routes/volunteerRoutes')
 const individualRoutes = require('./routes/individualRoutes')
+const forumRoutes = require('./routes/forumRoutes')
 
 // Initialize Express app
 const app = express();
@@ -73,6 +74,7 @@ app.use('/api/roles', roleRoutes)
 app.use('/api/cause', causeRoutes)
 app.use('/api/volunteers', volunteerRoutes)
 app.use('/api/individual', individualRoutes)
+app.use('/api/forum', forumRoutes)
 
 // Error handling middleware
 app.use((err, req, res, next) => {
