@@ -7,8 +7,10 @@ const createForumSchema = z.object({
   forumTopic: z.string().min(1),
   description: z.string().min(1)
 });
-const commentSchema = z.object({
-  comment: z.string().min(1)
+
+const updateForumSchema = z.object({
+  forumTopic: z.string().min(1).optional(),
+  description: z.string().min(1).optional()
 });
 
 // Create a new forum
@@ -22,7 +24,6 @@ exports.createForum = async (req, res) => {
     const forum = await Forum.create({
       forumTopic,
       description,
-      userId: req.individual._id
     });
     res.json({ success: true, data: forum });
   } catch (error) {
@@ -30,33 +31,60 @@ exports.createForum = async (req, res) => {
   }
 };
 
-// List forums (allowed or own)
+// List all forums (admin only)
 exports.listForums = async (req, res) => {
   try {
-    const userId = req.individual._id;
-    const forums = await Forum.find({
-      $or: [
-        { isAllowed: true },
-        { userId }
-      ]
-    }).populate('userId', 'name').sort({ createdAt: -1 });
+    const forums = await Forum.find()
     res.json({ success: true, data: forums });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message || 'Error fetching forums' });
   }
 };
 
-// Get single forum (allowed or own)
+// List allowed forums (public)
+exports.listAllowedForums = async (req, res) => {
+  try {
+    const forums = await Forum.find({ isAllowed: true })
+    res.json({ success: true, data: forums });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message || 'Error fetching forums' });
+  }
+};
+
+// Get single forum (admin)
 exports.getForum = async (req, res) => {
   try {
-    const forum = await Forum.findById(req.params.id).populate('userId', 'name');
-    if (!forum) return res.status(404).json({ success: false, error: 'Forum not found' });
-    if (!forum.isAllowed && String(forum.userId._id) !== String(req.individual._id)) {
-      return res.status(403).json({ success: false, error: 'Not allowed to view this forum' });
+    const forum = await Forum.findById(req.params.id)
+    if (!forum) {
+      return res.status(404).json({ success: false, error: 'Forum not found' });
     }
     res.json({ success: true, data: forum });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message || 'Error fetching forum' });
+  }
+};
+
+// Update forum (admin)
+exports.updateForum = async (req, res) => {
+  try {
+    const parse = updateForumSchema.safeParse(req.body);
+    if (!parse.success) {
+      return res.status(400).json({ success: false, error: parse.error.errors });
+    }
+
+    const forum = await Forum.findByIdAndUpdate(
+      req.params.id,
+      { $set: parse.data },
+      { new: true }
+    );
+
+    if (!forum) {
+      return res.status(404).json({ success: false, error: 'Forum not found' });
+    }
+
+    res.json({ success: true, data: forum });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message || 'Error updating forum' });
   }
 };
 
@@ -72,7 +100,7 @@ exports.addComment = async (req, res) => {
     if (!forum.isAllowed) return res.status(403).json({ success: false, error: 'Forum not allowed for comments' });
     forum.comments.push({
       comment: req.body.comment,
-      userId: req.individual._id,
+        userId: req.user._id,
       timestamp: new Date()
     });
     await forum.save();

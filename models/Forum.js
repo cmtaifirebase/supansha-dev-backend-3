@@ -23,7 +23,6 @@ const forumSchema = new mongoose.Schema({
         type:[commentsSchema],
         required:false
     },
-    individualId:{ type: mongoose.Schema.Types.ObjectId, ref: 'Individual' },
 
 
 })
